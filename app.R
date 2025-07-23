@@ -61,7 +61,9 @@ server <- function(input, output, session) {
 
     session$sendCustomMessage("renderStructure",
                               list(data = paste0(readLines(input[["structureFile"]][["datapath"]]), collapse = "\n"),
-                                   colorMap = as.list(color_map)))
+                                   colorMap = as.list(color_map),
+                                   protName = tools::file_path_sans_ext(input[["structureFile"]][["name"]])
+                                   ))
   })
 }
 

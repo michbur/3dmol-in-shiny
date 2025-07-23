@@ -1,5 +1,6 @@
 let viewer;
 let isSpinning = true;
+let protName = 'screenshot'
 
 function initViewer() {
   viewer = $3Dmol.createViewer('viewer', { backgroundColor: 'white' });
@@ -22,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function () {
       canvas.toBlob(function(blob) {
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = '3dmol_screenshot.png';
+        a.download = `${protName}.png`;
         a.click();
       }, 'image/png');
     } catch (e) {
@@ -39,6 +40,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 Shiny.addCustomMessageHandler('renderStructure', function(message) {
+  protName = message.protName || 'screenshot';
 
   viewer.clear();
   viewer.addModel(message.data, 'cif');
