@@ -24,6 +24,9 @@ ui <- fluidPage(
   }
   #toggle-spin {
   cursor: pointer;
+  margin-left: 20px;
+  transform: scale(1.3);
+  vertical-align: middle;
   }
 ")),
 
@@ -37,9 +40,8 @@ ui <- fluidPage(
     mainPanel(
       div(id = "toolbar",
           tags$button(id = "btn-screenshot", "Screenshot"),
-          tags$input(id = "toggle-spin", type = "checkbox", checked = "checked",
-                     style = "margin-left: 20px; transform: scale(1.3); vertical-align: middle;"),
-          tags$label(" Spin", `for` = "toggle-spin", style = "margin-left: 8px; font-size: 16px;")
+          tags$input(id = "toggle-spin", type = "checkbox", checked = "checked"),
+          tags$label(" Spin me!", `for` = "toggle-spin", style = "margin-left: 8px; font-size: 16px;")
 
       ),
       div(id = "viewer",
@@ -53,9 +55,6 @@ ui <- fluidPage(
 server <- function(input, output, session) {
   observeEvent(input[["structureFile"]], {
     req(input[["structureFile"]])
-
-    color_map <- c("10" = "red", "11" = "orange", "12" = "yellow", "18" = "red",
-                   "19" = "red", "20" = "red", "21" = "red")
 
     color_map <- rep("red", 100)
     names(color_map) <- 1L:100
