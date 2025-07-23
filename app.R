@@ -9,11 +9,11 @@ ui <- fluidPage(
 
   tags$style(HTML("
   #toolbar {
-    margin: 10px;
+    margin: 10px 0;
+    position: relative !important;
+    z-index: 10;
   }
   #btn-screenshot {
-    position: absolute;
-    z-index: 1000;
     font-size: 16px;
     padding: 8px 12px;
     background-color: #007bff;
@@ -21,6 +21,9 @@ ui <- fluidPage(
     border: none;
     border-radius: 4px;
     cursor: pointer;
+  }
+  #toggle-spin {
+  cursor: pointer;
   }
 ")),
 
@@ -33,7 +36,11 @@ ui <- fluidPage(
 
     mainPanel(
       div(id = "toolbar",
-          tags$button(id = "btn-screenshot", "Screenshot")
+          tags$button(id = "btn-screenshot", "Screenshot"),
+          tags$input(id = "toggle-spin", type = "checkbox", checked = "checked",
+                     style = "margin-left: 20px; transform: scale(1.3); vertical-align: middle;"),
+          tags$label(" Spin", `for` = "toggle-spin", style = "margin-left: 8px; font-size: 16px;")
+
       ),
       div(id = "viewer",
           style = "width:100%; height:600px")
