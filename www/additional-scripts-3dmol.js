@@ -43,7 +43,7 @@ Shiny.addCustomMessageHandler('renderStructure', function(message) {
   protName = message.protName || 'screenshot';
 
   viewer.clear();
-  viewer.addModel(message.data, 'cif');
+  viewer.addModel(message.data);
 
   const colorMap = message.colorMap;
 

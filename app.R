@@ -56,8 +56,8 @@ server <- function(input, output, session) {
   observeEvent(input[["structureFile"]], {
     req(input[["structureFile"]])
 
-    color_map <- rep("red", 100)
-    names(color_map) <- 1L:100
+    color_map <- rep("red", 50)
+    names(color_map) <- 1L:50
 
     session$sendCustomMessage("renderStructure",
                               list(data = paste0(readLines(input[["structureFile"]][["datapath"]]), collapse = "\n"),
