@@ -2,6 +2,44 @@ library(shiny)
 
 options(shiny.maxRequestSize = 30*1024^2)
 
+
+generate_color_map <- function() {
+  color_map <- rep("red", 50)
+  names(color_map) <- sort(sample(1L:100, 50))
+  color_map
+}
+
+viewer3dmolUI <- function(id) {
+  ns <- NS(id)
+  tagList(
+    div(
+      tags$button("Screenshot", id = ns("btn"), `data-screenshot` = ns("viewer")),
+      tags$input(type = "checkbox", id = ns("spin"), checked = "checked", `data-spin` = ns("viewer")),
+      tags$label(" Spin", `for` = ns("spin")),
+      style = "margin-bottom: 10px;"
+    ),
+    div(id = ns("viewer"),
+        `structure-viewer` = NA,
+        style = "width:100%; height:400px; margin-bottom: 30px;")
+  )
+}
+
+viewer3dmolServer <- function(id, fileReactive, color_map) {
+  moduleServer(id, function(input, output, session) {
+    observeEvent(fileReactive(), {
+      file <- fileReactive()
+      req(file)
+
+      session$sendCustomMessage("renderStructure", list(
+        containerId = session$ns("viewer"),
+        data = paste(readLines(file$datapath), collapse = "\n"),
+        colorMap = as.list(color_map),
+        protName = tools::file_path_sans_ext(file$name)
+      ))
+    })
+  })
+}
+
 ui <- fluidPage(
   tags$head(
     tags$script(src = "https://3Dmol.org/build/3Dmol-min.js")
@@ -11,7 +49,6 @@ ui <- fluidPage(
   #toolbar {
     margin: 10px 0;
     position: relative !important;
-    z-index: 10;
   }
   #btn-screenshot {
     font-size: 16px;
@@ -23,10 +60,13 @@ ui <- fluidPage(
     cursor: pointer;
   }
   #toggle-spin {
-  cursor: pointer;
-  margin-left: 20px;
-  transform: scale(1.3);
-  vertical-align: middle;
+    cursor: pointer;
+    margin-left: 20px;
+    transform: scale(1.3);
+    vertical-align: middle;
+  }
+  canvas {
+    position: relative !important;
   }
 ")),
 
@@ -38,14 +78,9 @@ ui <- fluidPage(
     ),
 
     mainPanel(
-      div(id = "toolbar",
-          tags$button(id = "btn-screenshot", "Screenshot"),
-          tags$input(id = "toggle-spin", type = "checkbox", checked = "checked"),
-          tags$label(" Spin me!", `for` = "toggle-spin", style = "margin-left: 8px; font-size: 16px;")
-
-      ),
-      div(id = "viewer",
-          style = "width:100%; height:600px")
+      viewer3dmolUI("viewer1"),
+      h3("Przerwa"),
+      viewer3dmolUI("viewer2")
     )
   ),
 
@@ -53,18 +88,11 @@ ui <- fluidPage(
 )
 
 server <- function(input, output, session) {
-  observeEvent(input[["structureFile"]], {
-    req(input[["structureFile"]])
+  file_reactive <- reactive(input[["structureFile"]])
 
-    color_map <- rep("red", 50)
-    names(color_map) <- 1L:50
+  viewer3dmolServer("viewer1", fileReactive = file_reactive, color_map = generate_color_map())
 
-    session$sendCustomMessage("renderStructure",
-                              list(data = paste0(readLines(input[["structureFile"]][["datapath"]]), collapse = "\n"),
-                                   colorMap = as.list(color_map),
-                                   protName = tools::file_path_sans_ext(input[["structureFile"]][["name"]])
-                                   ))
-  })
+  viewer3dmolServer("viewer2", fileReactive = file_reactive, color_map = generate_color_map())
 }
 
 shinyApp(ui, server)
